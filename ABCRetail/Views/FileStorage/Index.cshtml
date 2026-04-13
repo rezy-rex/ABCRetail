@@ -1,0 +1,81 @@
+﻿@{
+    ViewData["Title"] = "File Storage";
+    var files = ViewBag.Files as List<Azure.Storage.Files.Shares.Models.ShareFileItem> ?? new();
+}
+
+<div class="two-col">
+    <div class="card">
+        <div class="card-header">Create Log Entry</div>
+        <form method="post" action="/FileStorage/CreateLog">
+            <div class="form-group">
+                <label>Log File Name</label>
+                <input name="fileName" placeholder="e.g. app-errors-2025" required />
+                <span class="input-hint">.txt will be appended automatically</span>
+            </div>
+            <div class="form-group">
+                <label>Log Content</label>
+                <textarea name="content" rows="5" placeholder="Enter log message or event details..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Save Log File</button>
+        </form>
+    </div>
+    <div class="card">
+        <div class="card-header">Upload Existing File</div>
+        <form method="post" action="/FileStorage/UploadFile" enctype="multipart/form-data">
+            <div class="form-group">
+                <label>Select File</label>
+                <div class="file-drop">
+                    <input type="file" name="file" required />
+                    <div class="file-drop-label">
+                        <span class="file-drop-icon">◫</span>
+                        <span>Click to select a file</span>
+                        <span class="file-drop-hint">Any file type supported</span>
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Upload to File Share</button>
+        </form>
+        <div class="divider"></div>
+        <div class="stat-row">
+            <div class="stat">
+                <span class="stat-num">@files.Count</span>
+                <span class="stat-label">Files Stored</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card full-width">
+    <div class="card-header">File Share Contents <span class="badge">@files.Count files</span></div>
+    @if (!files.Any())
+    {
+        <div class="empty-state">No files yet. Create a log entry or upload a file above.</div>
+    }
+    else
+    {
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>File Name</th><th>Size</th><th>Actions</th></tr></thead>
+                <tbody>
+                    @foreach (var f in files)
+                    {
+                        <tr>
+                            <td><span class="file-icon-inline">◫</span>@f.Name</td>
+                            <td>@(f.FileSize.HasValue ? $"{f.FileSize.Value / 1024.0:F1} KB" : "—")</td>
+                            <td>
+                                @if (f.Name.EndsWith(".txt") || f.Name.EndsWith(".log"))
+                                {
+                                    <a href="/FileStorage/ViewFile?fileName=@Uri.EscapeDataString(f.Name)" class="btn btn-sm btn-outline">View</a>
+                                }
+                                <form method="post" action="/FileStorage/Delete" style="display:inline">
+                                    <input type="hidden" name="fileName" value="@f.Name" />
+                                    <button type="submit" class="btn btn-sm btn-danger">✕</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

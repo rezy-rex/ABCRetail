@@ -1,0 +1,60 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] ABC Retail Cloud</title>
+    <link rel="icon" type="image/x-icon" href="~/favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <img src="~/images/logo.png" alt="ABC Retail Logo" class="sidebar-logo-img" />
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/" class="nav-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" ? "active" : "")">
+                <span class="nav-icon">⬡</span> Dashboard
+            </a>
+            <div class="nav-group-label">Azure Storage</div>
+            <a href="/TableStorage" class="nav-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "TableStorage" ? "active" : "")">
+                <span class="nav-icon">⊞</span> Table Storage
+            </a>
+            <a href="/BlobStorage" class="nav-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "BlobStorage" ? "active" : "")">
+                <span class="nav-icon">◈</span> Blob Storage
+            </a>
+            <a href="/QueueStorage" class="nav-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "QueueStorage" ? "active" : "")">
+                <span class="nav-icon">⊷</span> Queue Storage
+            </a>
+            <a href="/FileStorage" class="nav-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "FileStorage" ? "active" : "")">
+                <span class="nav-icon">◫</span> File Storage
+            </a>
+        </nav>
+        <div class="sidebar-footer">ABCretail</div>
+    </aside>
+
+    <main class="main-content">
+        <div class="topbar">
+            <h1 class="page-title">@ViewData["Title"]</h1>
+            <div class="topbar-badge">Azure Storage Solution</div>
+        </div>
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success">✓ @TempData["Success"]</div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-error">✕ @TempData["Error"]</div>
+        }
+
+        <div class="content-body">
+            @RenderBody()
+        </div>
+    </main>
+
+    <script src="~/js/site.js"></script>
+</body>
+</html>

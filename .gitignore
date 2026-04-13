@@ -1,0 +1,23 @@
+## .NET / Visual Studio
+.vs/
+bin/
+obj/
+*.user
+*.suo
+*.cache
+*.log
+[Oo]utput/
+[Dd]ebug/
+[Rr]elease/
+
+## IDE / OS
+.DS_Store
+Thumbs.db
+*.zip
+*.rar
+
+## Azure / Secrets (CRITICAL)
+appsettings.Development.json
+user-secrets.json
+*.pfx
+*.cer

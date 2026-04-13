@@ -1,0 +1,99 @@
+﻿@{
+    ViewData["Title"] = "Queue Storage";
+    var messages = ViewBag.Messages as List<Azure.Storage.Queues.Models.PeekedMessage> ?? new();
+    int messageCount = ViewBag.MessageCount ?? 0;
+}
+
+<div class="two-col">
+    <!-- Order Event Form -->
+    <div class="card">
+        <div class="card-header">Enqueue Order Event</div>
+        <form method="post" action="/QueueStorage/SendOrderMessage">
+            <div class="form-group">
+                <label>Order ID</label>
+                <input name="orderId" type="text" placeholder="e.g. 1001" required />
+            </div>
+            <div class="form-group">
+                <label>Product Name</label>
+                <input name="productName" type="text" placeholder="e.g. Running Shoes" required />
+            </div>
+            <div class="form-group">
+                <label>Action Type</label>
+                <select name="action">
+                    <option>Processing order</option>
+                    <option>Order confirmed</option>
+                    <option>Inventory updated</option>
+                    <option>Order dispatched</option>
+                    <option>Order delivered</option>
+                    <option>Stock replenishment</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Enqueue Event</button>
+        </form>
+    </div>
+
+    <!-- Custom Message & Queue Controls -->
+    <div class="card">
+        <div class="card-header">Custom Message & Controls</div>
+        <form method="post" action="/QueueStorage/SendMessage">
+            <div class="form-group">
+                <label>Message Payload</label>
+                <textarea name="message" rows="3" placeholder="e.g. Manual inventory sync trigger..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Send Message</button>
+        </form>
+
+        <div class="divider"></div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <div class="stat-row">
+                <div class="stat">
+                    <span class="stat-num">@messageCount</span>
+                    <span class="stat-label">Pending</span>
+                </div>
+            </div>
+            <form method="post" action="/QueueStorage/ProcessNext">
+                <button type="submit" class="btn btn-outline">Process Next ↓</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="card full-width">
+    <div class="card-header">
+        <span>Message Queue</span>
+        <span class="badge">@messages.Count Visible</span>
+    </div>
+    @if (!messages.Any())
+    {
+        <div class="empty-state">No messages in queue. Submit events or custom payloads to begin.</div>
+    }
+    else
+    {
+        <div class="queue-list">
+            @for (int i = 0; i < messages.Count; i++)
+            {
+                var raw = messages[i].Body.ToString();
+                string decoded;
+                try { decoded = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(raw)); }
+                catch { decoded = raw; }
+
+                // Extract action tag for quick scanning (falls back gracefully)
+                var parts = decoded.Split('|', StringSplitOptions.RemoveEmptyEntries);
+                var actionTag = parts.Length > 0 ? parts[0].Trim() : "Custom";
+                var timestamp = messages[i].InsertedOn?.ToString("yyyy-MM-dd HH:mm:ss") ?? "—";
+
+                <div class="queue-item">
+                    <div class="queue-index">#@(i + 1)</div>
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                            <span class="badge" style="background: var(--azure-dim); color: var(--azure); border-color: rgba(37,99,235,0.2);">@actionTag</span>
+                            <span class="queue-text" style="margin-bottom: 0;">@decoded</span>
+                        </div>
+                        <div class="queue-meta">Enqueued: @timestamp UTC</div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

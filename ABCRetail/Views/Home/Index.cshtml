@@ -1,0 +1,43 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="dashboard-header" style="margin-bottom: 1.8rem;">
+    <h1 style="font-size: 1.65rem; font-weight: 800; color: var(--text); margin-bottom: .4rem;">ABC Retail Dashboard</h1>
+    <p style="color: var(--text-muted); font-size: .95rem; max-width: 600px;">Centralized management portal for your Azure Storage infrastructure. Select a service below to begin.</p>
+</div>
+
+<div class="dashboard-grid">
+    <a href="/TableStorage" class="dash-card">
+        <div class="dash-card-icon table-icon">⊞</div>
+        <div class="dash-card-body">
+            <h3>Table Storage</h3>
+            <p>Customer profiles &amp; product catalogue</p>
+        </div>
+        <div class="dash-card-arrow">→</div>
+    </a>
+    <a href="/BlobStorage" class="dash-card">
+        <div class="dash-card-icon blob-icon">◈</div>
+        <div class="dash-card-body">
+            <h3>Blob Storage</h3>
+            <p>Product images &amp; multimedia content</p>
+        </div>
+        <div class="dash-card-arrow">→</div>
+    </a>
+    <a href="/QueueStorage" class="dash-card">
+        <div class="dash-card-icon queue-icon">⊷</div>
+        <div class="dash-card-body">
+            <h3>Queue Storage</h3>
+            <p>Order processing &amp; inventory events</p>
+        </div>
+        <div class="dash-card-arrow">→</div>
+    </a>
+    <a href="/FileStorage" class="dash-card">
+        <div class="dash-card-icon file-icon">◫</div>
+        <div class="dash-card-body">
+            <h3>File Storage</h3>
+            <p>Application logs &amp; shared files</p>
+        </div>
+        <div class="dash-card-arrow">→</div>
+    </a>
+</div>

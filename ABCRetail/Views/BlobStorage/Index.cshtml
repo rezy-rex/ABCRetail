@@ -1,0 +1,94 @@
+﻿@{
+    ViewData["Title"] = "Blob Storage";
+    var blobs = ViewBag.Blobs as List<Azure.Storage.Blobs.Models.BlobItem> ?? new();
+    var getUrl = ViewBag.GetBlobUrl as Func<string, string>;
+}
+
+<div class="two-col">
+    <div class="card">
+        <div class="card-header">Upload Image / File</div>
+        <form method="post" action="/BlobStorage/Upload" enctype="multipart/form-data">
+            <div class="form-group">
+                <label>Select File</label>
+                <div class="file-drop">
+                    <input type="file" name="file" id="fileInput" accept="image/*,.pdf,.doc,.docx" required />
+                    <div class="file-drop-label">
+                        <span class="file-drop-icon">◈</span>
+                        <span>Click to select a file</span>
+                        <span class="file-drop-hint">Images, PDFs, and documents supported</span>
+                    </div>
+                </div>
+                <div id="fileName" class="file-name-preview"></div>
+            </div>
+            <button type="submit" class="btn btn-primary">Upload to Container</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <div class="card-header">Container Overview</div>
+        <div class="stat-row">
+            <div class="stat">
+                <span class="stat-num">@blobs.Count</span>
+                <span class="stat-label">Total Objects</span>
+            </div>
+        </div>
+        <div class="divider"></div>
+        <div style="display: flex; flex-direction: column; gap: .5rem; font-size: .82rem; color: var(--text-muted);">
+            <div style="display: flex; justify-content: space-between;"><span>Container</span><span class="badge">product-images</span></div>
+            <div style="display: flex; justify-content: space-between;"><span>Access Tier</span><span class="badge">Public</span></div>
+            <div style="display: flex; justify-content: space-between;"><span>Region</span><span class="badge">SA North</span></div>
+        </div>
+    </div>
+</div>
+
+<div class="card full-width">
+    <div class="card-header">Container Contents <span class="badge">@blobs.Count</span></div>
+    @if (!blobs.Any())
+    {
+        <div class="empty-state">No files uploaded yet. Use the form above to add media.</div>
+    }
+    else
+    {
+        <div class="blob-gallery">
+            @foreach (var blob in blobs)
+            {
+                var url = getUrl!(blob.Name);
+                var isImage = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" }
+                .Any(ext => blob.Name.EndsWith(ext, StringComparison.OrdinalIgnoreCase));
+                <div class="blob-card">
+                    @if (isImage)
+                    {
+                        <div class="blob-thumb"><img src="@url" alt="@blob.Name" loading="lazy" /></div>
+                    }
+                    else
+                    {
+                        <div class="blob-thumb blob-thumb-file"><span>◈</span></div>
+                    }
+                    <div class="blob-info">
+                        <div class="blob-name" title="@(blob.Name.Contains('_') ? blob.Name.Substring(blob.Name.IndexOf('_') + 1) : blob.Name)">@(blob.Name.Contains('_') ? blob.Name.Substring(blob.Name.IndexOf('_') + 1) : blob.Name)</div>
+                        <div class="blob-size">@(blob.Properties.ContentLength.HasValue ? $"{blob.Properties.ContentLength.Value / 1024.0:F1} KB" : "—")</div>
+                        <div class="blob-actions">
+                            <a href="@url" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline">Open</a>
+                            <form method="post" action="/BlobStorage/Delete" style="display:inline">
+                                <input type="hidden" name="blobName" value="@blob.Name" />
+                                <button type="submit" class="btn btn-sm btn-danger">✕</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const fileInput = document.getElementById('fileInput');
+        const fileNameDisplay = document.getElementById('fileName');
+        if (fileInput && fileNameDisplay) {
+            fileInput.addEventListener('change', function() {
+                fileNameDisplay.textContent = this.files[0]?.name ?? '';
+            });
+        }
+    });
+</script>

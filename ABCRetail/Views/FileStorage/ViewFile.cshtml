@@ -1,0 +1,15 @@
+﻿@{
+    ViewData["Title"] = "View File";
+    string fileName = ViewBag.FileName ?? "";
+    string content = ViewBag.Content ?? "";
+}
+
+<div class="card full-width">
+    <div class="card-header">
+        ◫ @fileName
+        <a href="/FileStorage" class="btn btn-sm btn-outline" style="margin-left:auto">← Back</a>
+    </div>
+    <div class="log-viewer">
+        <pre>@content</pre>
+    </div>
+</div>
